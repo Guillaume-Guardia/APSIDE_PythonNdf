@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import googlemaps
 from pyndf.logbook import Logger, log_time
 from pyndf.constants import CONST
@@ -25,7 +26,18 @@ class DistanceMatrixAPI(Logger):
 
         for key, value in CONST.FILE.YAML[CONST.TYPE.API].items():
             setattr(self, key, value)
-        self.client = googlemaps.Client(self.key)
+        # The API key is never stored in the repository, only in the environment
+        self.key = os.environ.get("GOOGLE_API_KEY", "").strip()
+        self.client = None
+        self.key_error = None
+        if not self.key:
+            self.key_error = "GOOGLE_API_KEY is not set"
+        else:
+            try:
+                self.client = googlemaps.Client(self.key)
+            except ValueError as error:  # The key doesn't have the format of a Google API key
+                self.key_error = f"GOOGLE_API_KEY is invalid ({error})"
+        self.key_error_logged = False
 
     @log_time
     def run(self, client, employee, use_db=True, use_cache=True, use_api=True, analyse=None):
@@ -70,6 +82,13 @@ class DistanceMatrixAPI(Logger):
 
         if not use_api:
             return None, CONST.STATUS.NO_USE_API
+
+        if self.client is None:
+            # Log once, only when the API is really needed
+            if not self.key_error_logged:
+                self.log.error(f"{self.key_error}: the distances can't be requested to the Google API.")
+                self.key_error_logged = True
+            return None, CONST.STATUS.NO_API_KEY
 
         dict_params = dict(
             origins=client_address,

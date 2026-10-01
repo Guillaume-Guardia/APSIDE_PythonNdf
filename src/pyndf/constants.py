@@ -18,7 +18,8 @@ class CONST:
     class FILE:
         """All important file"""
 
-        DB = os.path.join(DIR, "db", "pydb.db")
+        # NDF_DB allows to use another database (the tests use a temporary one)
+        DB = os.environ.get("NDF_DB") or os.path.join(DIR, "db", "pydb.db")
         TRANSLATION_DIR = os.path.join(DIR, "data", "translations")
         README = os.path.join(DIR, "..", "..", "README.md")
         LOGO = os.path.join(DIR, "data", "apside-logo.png")

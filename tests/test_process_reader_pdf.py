@@ -29,7 +29,7 @@ class TestPdfReader(unittest.TestCase):
         self.filename = self.create_pdf()
 
     def create_pdf(self):
-        data = Record()
+        data = Record(None)
         data.matricule = "0150"
         data.agence = "BREST"
 

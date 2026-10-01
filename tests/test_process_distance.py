@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import os
 import unittest
+from unittest import mock
 from pyndf.constants import CONST
 from pyndf.db.client import Client
 from pyndf.db.employee import Employee
@@ -8,6 +10,9 @@ from pyndf.db.measure import Measure
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.db.session import db
 from pyndf.utils import Utils
+
+# Tests which call the real Google API need a valid key
+requires_api = unittest.skipUnless(os.environ.get("GOOGLE_API_KEY"), "GOOGLE_API_KEY is not set")
 
 
 class TestDistanceMatrixAPI(unittest.TestCase):
@@ -35,6 +40,7 @@ class TestDistanceMatrixAPI(unittest.TestCase):
         for raw, result in dico:
             self.assertEqual(Utils.format_address(raw), result)
 
+    @requires_api
     def test_run(self):
         origin = "15000", "7 Rue George Sand, 29200 Brest"
         destination = "Apside", "90 Rue Ernest Hemingway, 29200 Brest"
@@ -55,6 +61,21 @@ class TestDistanceMatrixAPI(unittest.TestCase):
         self.assertEqual(round(distance, 1), 2.1)
         self.assertEqual(round(duration / 60), 4)
 
+    def test_run_without_key(self):
+        origin = "15000", "7 Rue George Sand, 29200 Brest"
+        destination = "Apside", "90 Rue Ernest Hemingway, 29200 Brest"
+        # No key, blank key and key with a wrong format (rejected by googlemaps.Client)
+        for key in ("", "   ", "not-a-google-key"):
+            with self.subTest(key=key), mock.patch.dict(os.environ, {"GOOGLE_API_KEY": key}):
+                api = DistanceMatrixAPI()
+
+                (result, status), time_spend = api.run(origin, destination, use_db=False, use_cache=False)
+
+                # Check status
+                self.assertEqual(status, CONST.STATUS.NO_API_KEY)
+                self.assertEqual(result, None)
+
+    @requires_api
     def test_run_no_address(self):
         origin = "15000", ""  # No address
         destination = "Apside", "90 Rue Ernest Hemingway, 29200 Brest"
@@ -72,6 +93,7 @@ class TestDistanceMatrixAPI(unittest.TestCase):
         self.assertEqual(status, CONST.STATUS.INVALID_REQUEST)
         self.assertEqual(result, None)
 
+    @requires_api
     def test_run_not_found(self):
         # indicates that the origin and/or destination of this pairing could not be geocoded.
         origin = "15000", "cgduyuyzyz uichsduicshd sss sdciucshui"
@@ -83,6 +105,7 @@ class TestDistanceMatrixAPI(unittest.TestCase):
         self.assertEqual(status, CONST.STATUS.NOT_FOUND)
         self.assertEqual(result, None)
 
+    @requires_api
     def test_run_zero_results(self):
         # indicates no route could be found between the origin and destination.
         origin = "15000", "Statue de la Liberté, New York, NY 10004, États-Unis"

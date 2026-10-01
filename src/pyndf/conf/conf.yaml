@@ -1,6 +1,5 @@
-# Google API params
+# Google API params (the API key is read from the environment variable GOOGLE_API_KEY)
 api:
-  key: AIzaSyBxHUFfYitI-doxwvyAv04rJwop13ktzcM
   language: fr
   mode: driving # driving, walking, bicycling, transit
   unit: metric # metric, imperial

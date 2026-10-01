@@ -43,7 +43,8 @@ class MainMenu(QtWidgets.QMenuBar):
         menu.addAction(QtGui.QIcon(CONST.UI.ICONS.PDF), self.tr("Generate PDF files"), self.window.generate)
 
         menu.addSeparator()
-        menu.addAction(QtGui.QIcon(CONST.UI.ICONS.CLO), self.tr("Exit"), self.window.close, "Ctrl+Q")
+        action = menu.addAction(QtGui.QIcon(CONST.UI.ICONS.CLO), self.tr("Exit"), self.window.close)
+        action.setShortcut("Ctrl+Q")
 
         return menu
 

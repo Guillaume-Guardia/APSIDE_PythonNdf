@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import traceback
 import shutil
 import yaml
@@ -50,6 +51,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             self.setMinimumWidth(int(app.resolution.width() / 1.5))
             self.setMinimumHeight(int(app.resolution.height() / 3))
 
+        # Remembered paths which are unreachable at launch (network share, USB drive...)
+        self.unreachable_paths = {}
         self.read_settings()
 
         # Process parameters
@@ -239,7 +242,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
                 setattr(self, name, attr)
 
             elif isinstance(getattr(self, name), set):
-                getattr(self, name).update(attr)
+                # Hide the paths which don't exist right now, but keep them in the settings:
+                # they can be only temporarily unreachable
+                self.unreachable_paths[name] = {path for path in attr if not os.path.exists(path)}
+                getattr(self, name).update(set(attr) - self.unreachable_paths[name])
 
     def closeEvent(self, event):
         """Qt method
@@ -260,7 +266,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         # Memory
         for name in CONST.MEMORY:
-            settings.setValue(name, yaml.dump(getattr(self, name)))
+            value = getattr(self, name)
+            if isinstance(value, set):
+                value = value | self.unreachable_paths.get(name, set())
+            settings.setValue(name, yaml.dump(value))
 
         self.app.set_language_mem()
         super().closeEvent(event)

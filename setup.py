@@ -3,8 +3,8 @@
 import sys
 from setuptools import setup
 
-with open("requirements.txt") as f:
-    required = f.read().splitlines()
+with open("requirements.txt", encoding="utf-8") as f:
+    required = [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
 sys.path.append(__file__)
 
@@ -18,6 +18,7 @@ setup(
     package_data={"pyndf": ["data/test.xlsx"]},
     license="LICENSE.txt",
     description="Do NDF for Apside",
-    long_description=open("README.md").read(),
+    long_description=open("README.md", encoding="utf-8").read(),
+    python_requires=">=3.14",
     install_requires=required,
 )
