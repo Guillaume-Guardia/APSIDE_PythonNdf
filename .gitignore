@@ -5,3 +5,6 @@
 src/pyndf/db/pydb.db
 
 data
+.venv
+output
+ndf.exe

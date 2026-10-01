@@ -1,123 +1,170 @@
-# Manuel de l'application NDF python
+# Manuel de l'application NDF Python
 
-## Contenu de cet article
+[![CI](https://github.com/Guillaume-Guardia/APSIDE_PythonNdf/actions/workflows/ci.yml/badge.svg)](https://github.com/Guillaume-Guardia/APSIDE_PythonNdf/actions/workflows/ci.yml)
+
+## Sommaire
 
 **[Installation](#installation)**  
+**[Clé de l'API Google](#cle_api)**  
+**[Génération de ndf.exe](#generation_exe)**  
 **[Lancement de l'application](#lancement_app)**  
 **[Lancement de l'algorithme](#lancement_algo)**  
 **[Visualisation des résultats](#resultats)**  
 **[Bonus](#bonus)**
 
-## Installation <a id="#installation"></a>
+## Installation <a id="installation"></a>
 
-1. [Télécharger python version 3.9.1](https://www.python.org/downloads/release/python-391/). Pour vérifier:
+1. [Télécharger Python 3.14](https://www.python.org/downloads/release/python-3148/) (ou une version plus récente). Pour vérifier l'installation : `python --version`.
     <!-- ![Vérification de l'installation de python](data/images/check_python.png) -->
 
-1. [Télécharger git](https://git-scm.com/downloads). Pour vérifier:
+2. [Télécharger Git](https://git-scm.com/downloads). Pour vérifier l'installation : `git --version`.
     <!-- ![Vérification de l'installation de git](data/images/check_git.png) -->
 
-3. Installation de la libraire d'environnement virtuel virtualenvwrapper-win via pip avec la commande *"pip install --user -U virtualenvwrapper-win"*.
-    <!-- ![Installation de virtualenvwrapper-win](data/images/install_virtualenv.png) -->
-
-4. Création d'un environnement virtuel avec la commande *"mkvirtualenv ndfurssaf"*. Le programme activera automatiquement l'environnement. 
-    <!-- ![Création d'un environnement virtuel](data/images/create_env.png) -->
-    <!-- ![Création d'un environnement virtuel](data/images/env_activated.png) -->
-
-5. Déplacement dans le répertoire de l'environnement virtuel avec la commande *"cdvirtualenv"*. 
-    <!-- ![Création d'un environnement virtuel](data/images/cdvirtualenv.png) -->
-
-6. Récupération de dépôt git depuis github avec la commande *"git clone https://github.com/Guillaume-Guardia/ndf-python"* . 
+3. Récupérer le dépôt Git depuis GitHub avec la commande `git clone https://github.com/Guillaume-Guardia/APSIDE_PythonNdf`, puis se placer à la racine du dépôt avec la commande `cd APSIDE_PythonNdf`.
     <!-- ![Création d'un environnement virtuel](data/images/gitclone.png)-->
 
-7. Installation des dépendances liées au projet ndf-python avec la commande *"pip install -e ."*
+4. Créer l'environnement virtuel *.venv* à la racine du dépôt (il est ignoré par Git) et installer les dépendances avec la commande `dev.bat install`.
     <!-- ![Création d'un environnement virtuel](data/images/dependance1.png) -->
     <!-- ![Création d'un environnement virtuel](data/images/dependance2.png) -->
 
-8. Enregistrement de l'environnement dans les variables d'environnements Windows avec la commande *"set NDF_ENV=ndfurssaf"* 
+5. Configurer la clé de l'API Google dans la variable d'environnement `GOOGLE_API_KEY` (voir [Clé de l'API Google](#cle_api)).
 
-9. Créer un raccourci du fichier ndf.exe
+6. Facultatif : générer le fichier *ndf.exe* avec la commande `dev.bat exe` (voir [Génération de ndf.exe](#generation_exe)).
+
+7. Créer un raccourci vers le fichier *ndf.exe* (ou *ndf.bat*) sur le bureau.
     <!-- ![Création d'un environnement virtuel](data/images/create_shortcut.png) -->
 
-## Lancement de l'application <a id="#lancement_app"></a>
+### Commandes de développement
 
-Il existe manière de démarrer l'application:
-* Par la ligne de commande *"py src/pyndf/main.py [-h] [--log {NOTSET, DEBUG, INFO, WARN, ERROR, CRITICAL}] [-e EXCEL] [-c CSV] [-o OUTPUT] [-l LANGUAGE]"* à la racine du dépôt git. Il faut s'assurer d'avoir activer l'environnement virtuel avant d'exécuter la commande. Pour activer l'environnement virtuel, il suffit de lancer la commande *"workon ndfurssaf"*. Pour se rendre à la racine du dépôt git, taper la commande *"cdvirtualenv & cd ndf-python"*.
-Explications des arguments facultatifs optionnels:
-  + -h, --help: Montre la liste des options.
-  + --log {NOTSET, DEBUG, INFO, WARN, ERROR, CRITICAL}: Niveau des logs affichés
-  + -e EXCEL, --excel EXCEL: Fichier Excel à utiliser
-  + -c CSV, --csv CSV: Fichier CSV à utiliser
-  + -o OUTPUT, --output OUTPUT: Le répertoire de sauvegarde
-  + -l LANGUAGE, --language LANGUAGE: Sélection de la langue de l'application (en ou fr)
-* Par le fichier ndf.bat en double cliquant sur l'icone.
-* Par le fichier ndf.exe en double-cliquant sur l'icone.
-* En créant un raccourci sur le fichier ndf.bat ou ndf.exe, et en double cliquant dessus.
+Le script *dev.bat*, à la racine du dépôt, regroupe les commandes utiles (la CI utilise les mêmes) :
+* `dev.bat install` : crée l'environnement virtuel *.venv* s'il n'existe pas et installe les dépendances (application et développement).
+* `dev.bat test` : vérifie les dépendances et lance les tests. Les tests qui appellent l'API Google ne sont lancés que si la variable d'environnement `GOOGLE_API_KEY` est définie. Les tests utilisent une base de données temporaire : la base de l'application (*src/pyndf/db/pydb.db*) n'est pas modifiée.
+* `dev.bat run` : lance l'application.
+* `dev.bat exe` : génère le fichier *ndf.exe* à partir de *ndf.bat*.
+* `dev.bat` : installe les dépendances, puis lance les tests.
 
-L'ensemble des façons va ouvrir la fenêtre de l'application prête à être utiliser.
+## Clé de l'API Google <a id="cle_api"></a>
+
+L'application calcule les distances avec l'API Google Distance Matrix, qui nécessite une clé. **La clé n'est jamais stockée dans le dépôt Git**, car celui-ci est public : elle est lue dans la variable d'environnement `GOOGLE_API_KEY`.
+
+### Obtenir une clé
+
+1. Se connecter à la [console Google Cloud](https://console.cloud.google.com/apis/credentials) et sélectionner le projet dans lequel l'API *Distance Matrix* est activée. Cette API est désormais « legacy » : elle ne peut plus être activée dans un nouveau projet, il faut donc réutiliser le projet existant.
+2. Cliquer sur *Créer des identifiants* > *Clé API*.
+3. Restreindre la clé : dans *Restrictions relatives aux API*, n'autoriser que l'API *Distance Matrix*. Cela limite les dégâts en cas de fuite de la clé.
+
+Si une clé a été publiée par erreur (commit, capture d'écran, message…), il faut la supprimer dans la console Google Cloud et en créer une nouvelle : la retirer du code ne suffit pas, car elle reste dans l'historique Git.
+
+### Configurer la clé
+
+* Sur le poste : lancer une seule fois la commande `setx GOOGLE_API_KEY "la_cle"`. La variable est enregistrée pour l'utilisateur Windows, mais seuls les terminaux et programmes ouverts **après** la commande la voient : il faut donc relancer le terminal et l'application.
+* Pour la CI GitHub : ajouter un secret `GOOGLE_API_KEY` dans *Settings* > *Secrets and variables* > *Actions* du dépôt. Sans ce secret, les tests qui appellent l'API Google sont ignorés.
+
+Sans clé (ou avec une clé au mauvais format), l'application démarre normalement, mais les distances qui ne sont ni dans le cache ni dans la base de données ne peuvent pas être calculées : elles apparaissent avec le statut rouge *NO_API_KEY* dans l'onglet *Analyse de l'API Google*. Une clé au bon format mais refusée par Google (clé révoquée, API non autorisée…) donne le statut *REQUEST_DENIED*.
+
+## Génération de ndf.exe <a id="generation_exe"></a>
+
+Le fichier *ndf.exe* n'est pas versionné dans Git : il est généré à partir de *ndf.bat* avec l'outil [Bat To Exe Converter](https://www.f2ko.de/en/b2e.php).
+
+1. Installer Bat To Exe Converter (emplacement par défaut : `C:\Program Files\Bat To Exe Converter`). S'il est installé ailleurs, définir la variable d'environnement `B2E` avec le chemin de *Bat_To_Exe_Converter.exe*.
+2. Lancer la commande `dev.bat exe` à la racine du dépôt. Le fichier *ndf.exe* est créé (ou remplacé) à côté de *ndf.bat*, avec l'icône *data/icons/pyndf.ico*.
+
+À savoir :
+* Il faut régénérer *ndf.exe* après chaque modification de *ndf.bat*, car l'exécutable contient une copie du script.
+* *ndf.exe* doit rester à la racine du dépôt, car il utilise le dossier *.venv* et le dossier *src* situés à côté de lui. Pour le lancer depuis le bureau, il faut créer un raccourci plutôt que de le déplacer.
+* Les lignes commençant par `::` en haut de *ndf.bat* sont des commentaires ajoutés par Bat To Exe Converter (ses réglages encodés). Elles ne sont pas exécutées et peuvent être conservées.
+* Depuis Git Bash, la ligne de commande de Bat To Exe Converter échoue (« Incorrect command line »), car Git Bash transforme les options `/bat`, `/exe`, etc. en chemins. Il faut utiliser `dev.bat exe` depuis cmd ou PowerShell.
+
+## Lancement de l'application <a id="lancement_app"></a>
+
+Il existe plusieurs manières de démarrer l'application :
+* Par la ligne de commande `python src/pyndf/main.py [-h] [--log {notset,debug,info,warn,error,critical}] [-e EXCEL] [-c CSV] [-o OUTPUT] [-l LANGUAGE]`, à la racine du dépôt Git. Il faut d'abord activer l'environnement virtuel avec la commande `.venv\Scripts\activate`, à la racine du dépôt Git.
+
+  Arguments facultatifs :
+  + `-h`, `--help` : affiche la liste des options.
+  + `--log {notset,debug,info,warn,error,critical}` : niveau des logs affichés.
+  + `-e EXCEL`, `--excel EXCEL` : fichier Excel à utiliser.
+  + `-c CSV`, `--csv CSV` : fichier CSV à utiliser.
+  + `-o OUTPUT`, `--output OUTPUT` : répertoire de sauvegarde.
+  + `-l LANGUAGE`, `--language LANGUAGE` : langue de l'application (`en` ou `fr`).
+* Par la commande `dev.bat run`, à la racine du dépôt Git.
+* En double-cliquant sur le fichier *ndf.bat*. Les arguments de la ligne de commande ci-dessus sont aussi acceptés, par exemple : `ndf.bat -l en`.
+* En double-cliquant sur le fichier *ndf.exe* (après l'avoir généré).
+* En double-cliquant sur un raccourci vers le fichier *ndf.bat* ou *ndf.exe*.
+
+Toutes ces méthodes ouvrent la fenêtre de l'application, prête à être utilisée.
 
   <!-- ![Création d'un environnement virtuel](data/images/patron.png) -->
 
-## Lancement de l'algorithme <a id="#lancement_algo"></a>
+## Lancement de l'algorithme <a id="lancement_algo"></a>
 
-Pour lancer l'algorithme depuis l'interface utilisateur graphique, il suffit de cliquer sur le bouton destiné à générer les fichiers PDF au centre de l'onglet processus. Il faut, bien entendu avoir préalablement renseigné les différents paramètres qui sont:
-* le fichier EXCEL (fichier avec l'extension correspondant à une des expressions régulières  \*.xl\* et \*. XLS)
-* le fichier CSV issue de la base de données
-* le répertoire de sauvegarde
+Pour lancer l'algorithme depuis l'interface graphique, il suffit de cliquer sur le bouton de génération des fichiers PDF, au centre de l'onglet *Processus*. Il faut bien entendu avoir renseigné au préalable les paramètres suivants :
+* le fichier EXCEL (dont l'extension correspond à l'un des motifs `*.xl*` ou `*.XLS`) ;
+* le fichier CSV issu de la base de données ;
+* le répertoire de sauvegarde.
 
-Si toutes les conditions sont réunis, on peut cliquer sur le bouton pour démarrer l'algorithme. Cela va faire apparaître la barre de statut d'exécution (un message, un bouton *Annuler* qui va stopper l'exécution de l'algorithme, et une barre de progression).
+Si toutes les conditions sont réunies, on peut cliquer sur le bouton pour démarrer l'algorithme. La barre de statut d'exécution apparaît alors : un message, un bouton *Annuler* qui arrête l'exécution de l'algorithme, et une barre de progression.
 
-### 1ère étape: Lecture du fichier EXCEL
+### 1re étape : lecture du fichier EXCEL
 
-L'algorithme va passer en revue chaque ligne non vide du fichier EXCEL renseigné. Chaque ligne avec un libellé correspondant à l'expression régulière *.\*DEPLACEMENT.\** sera sélectionné. 
-*Astuce: Avant de démarrer l'algorithme, en se rendant dans l'onglet de visualisation du fichier EXCEL, on peut apercevoir les lignes bleues qui vont être sélectionnées durant l'algo.*
+L'algorithme passe en revue chaque ligne non vide du fichier EXCEL renseigné. Chaque ligne dont le libellé correspond à l'expression régulière `.*DEPLACEMENT.*` est sélectionnée.
 
-### 2ème étape: Lecture du fichier CSV
+*Astuce : avant de démarrer l'algorithme, l'onglet de visualisation du fichier EXCEL affiche en bleu les lignes qui seront sélectionnées.*
 
-Comme pour le fichier EXCEL, l'algorithme va déterminer les lignes de données à sélectionner, c'est à dire, les lignes où il y a au moins une indemnité non nulle. 
-*Astuce: Comme pour le fichier EXCEL, on peut visualiser avant démarrage du processus, les différentes lignes qui seront sélectionnées par la suite.*
+### 2e étape : lecture du fichier CSV
 
-### 3ème étape: Obtention de la distance entre l'adresse du client et l'adresse de l'intervenant:
+Comme pour le fichier EXCEL, l'algorithme détermine les lignes de données à sélectionner, c'est-à-dire les lignes qui contiennent au moins une indemnité non nulle.
 
-Cette partie va récupérer la distance que parcoure l'intervenant en allant au travail. Les mesures se basent sur l'API Google Distance Matrix.
+*Astuce : comme pour le fichier EXCEL, on peut visualiser, avant le démarrage du processus, les lignes qui seront sélectionnées.*
 
-### 4ème étape: Création des fichiers PDF
+### 3e étape : calcul de la distance entre l'adresse du client et l'adresse de l'intervenant
 
-Pour chaque matricule renseigné dans les fichiers CSV et EXCEL, le programme créera une note de frais avec toutes les informations disponibles récupérées précedemment. En l'occurence, pour le fichier EXCEL, toutes les missions effectuées par l'intervenant au cours du mois. L'algorithme calcule automatiquement la distance parcourue par mois. Pour les données recueillis dans le fichier CSV, un simple report de toutes les indemnités non nulles. Les fichiers PDF sont disponibles dans le répertoire de sauvegarde indiqué par l'utilisateur. 
+Cette étape récupère la distance que parcourt l'intervenant pour se rendre au travail. Les mesures s'appuient sur l'API Google Distance Matrix.
 
-## Visualisation des résultats <a id="#resultats"></a>
+### 4e étape : création des fichiers PDF
 
-Pour vérifier les résultats de l'algorithme, on peut se rendre dans l'onglet *Analyse Globale*. Pour chaque étape, un statut est indiqué :
-* une pastille verte si tout s'est passé comme prévu
-* une pastille rouge si un problème a été remonté
+Pour chaque matricule présent dans les fichiers CSV et EXCEL, le programme crée une note de frais avec toutes les informations récupérées précédemment :
+* pour le fichier EXCEL, toutes les missions effectuées par l'intervenant au cours du mois. L'algorithme calcule automatiquement la distance parcourue sur le mois ;
+* pour le fichier CSV, un simple report de toutes les indemnités non nulles.
 
-Pour plus de simplicité, la ligne totale (la dernière) résume l'ensemble de l'algorithme.
+Les fichiers PDF sont enregistrés dans le répertoire de sauvegarde indiqué par l'utilisateur.
+
+## Visualisation des résultats <a id="resultats"></a>
+
+Pour vérifier les résultats de l'algorithme, il faut se rendre dans l'onglet *Analyse Globale*. Pour chaque étape, un statut est indiqué :
+* une pastille verte si tout s'est passé comme prévu ;
+* une pastille rouge si un problème a été remonté.
+
+Pour plus de simplicité, la ligne du total (la dernière) résume l'ensemble de l'algorithme.
 
 ### Distance
 
-On peut vérifier toutes les requêtes de distance dans l'onglet *Analyse de l'API Google*.
+Toutes les requêtes de distance sont consultables dans l'onglet *Analyse de l'API Google*.
 
 ### Fichiers PDF
 
-En se rendant dans l'onglet *Analyse des fichiers PDF*, un simple coup d'oeil permet de vérifier pour un matricule donné, le fichier PDF (accessible via le bouton prévu à cet effet), le nombre de missions (nombre de lignes sélectionnées dans le fichier EXCEL + la ligne pour l'agence d'origine si pas déjà existante), le nombre d'indemnités (nombre d'indemnités non nulles trouvées dans le fichier CSV) et le status (rouge ou vert).
-Si le statut est illustré par une pastille rouge, un bouton de regénération individuel apparait dans la dernière colonne. Cela va relancer l'algorithme pour ce matricule.
+L'onglet *Analyse des fichiers PDF* permet de vérifier d'un simple coup d'œil, pour un matricule donné :
+* le fichier PDF (accessible via le bouton prévu à cet effet) ;
+* le nombre de missions (nombre de lignes sélectionnées dans le fichier EXCEL, plus la ligne de l'agence d'origine si elle n'existe pas déjà) ;
+* le nombre d'indemnités (nombre d'indemnités non nulles trouvées dans le fichier CSV) ;
+* le statut (rouge ou vert).
 
-## Bonus <a id="#bonus"></a>
+Si le statut est une pastille rouge, un bouton de régénération individuelle apparaît dans la dernière colonne. Il relance l'algorithme pour ce matricule.
 
-Il existe un plus grand panel de fonctionalités liés au développement de l'application. Celles-ci sont "cachées" et peuvent être activé avec le l'option *mode developpeur*.
-On peut facilement activer/desactiver les fonctionalités suivantes:
-* Sauvegarde des fichiers temporaires: En modifiant le fichier EXCEL ou CSV dans les onglets correspondants, on peut sauver le tableau dans un fichier portant le même nom en gardant en tête que l'extension ne sera pas forcément la même.
-* Utiliser le multithreading: Pour la création des fichiers PDF, deux méthodes ont été implémentées
-* les créations se font les unes après les autres -> simple thread.
-* les créations se font les unes pendant les autres (avec une limite de 20 threads au maximum en même temps) -> multithread.
-L'utilisation de la deuxième méthode est recommandée puisqu'elle est environ 25% plus rapide que la première méthode.
+## Bonus <a id="bonus"></a>
 
-* Ecraser PDF: Lors de la création de fichier PDF, l'application ne demande pas à l'utilisateur si un fichier portant le même nom existe déjà. Si l'on décoche cette option, l'algorithme ne va alors pas créer de fichier, et passera au suivant.
+L'application propose d'autres fonctionnalités, liées à son développement. Elles sont « cachées » et peuvent être activées avec l'option *Mode développeur*.
+On peut alors activer ou désactiver facilement les fonctionnalités suivantes :
+* *Sauvegarder les fichiers temporaires* : après avoir modifié le fichier EXCEL ou CSV dans les onglets correspondants, on peut enregistrer le tableau dans un fichier portant le même nom. Attention, l'extension ne sera pas forcément la même.
+* *Utiliser le multithreading* : deux méthodes ont été implémentées pour la création des fichiers PDF :
+  + les fichiers sont créés les uns après les autres (un seul thread) ;
+  + les fichiers sont créés en parallèle, avec au maximum 20 threads simultanés (multithread).
 
-* Utiliser la DB: On peut desactiver la recherche dans la base de données prévu pour éviter d'utiliser l'API pour des requêtes déjà effectuées. L'utilisation est recommandée mais pas obligatoire.
+  La deuxième méthode est recommandée, car elle est environ 25 % plus rapide que la première.
+* *Écraser PDF* : lors de la création des fichiers PDF, l'application ne demande pas de confirmation à l'utilisateur si un fichier du même nom existe déjà. Si l'on décoche cette option, l'algorithme ne crée pas le fichier et passe au suivant.
+* *Utiliser la DB* : on peut désactiver la recherche dans la base de données, prévue pour éviter d'appeler l'API pour des requêtes déjà effectuées. Son utilisation est recommandée, mais pas obligatoire.
+* *Utiliser le CACHE* : l'utilisation du cache est recommandée et cette option ne doit pas être décochée sans bonne raison. Le cache est bien plus performant que l'API Google ou la base de données : la récupération de la donnée est quasi instantanée.
+* *Utiliser l'API* : cette option a été ajoutée pour le développement et ne doit pas être désactivée.
 
-* Utiliser le CACHE: L'utilisation du cache est recommandée et ne dois pas être décochée pour une bonne raison. Les performances liées à l'utilisation du cache face à l'API Google ou la DB est impressionante: la récupération de la donnée est quasi instantanée.
-
-* Utiliser l'API: Cette option a été ajouté pour le développement et ne doit pas être désactivée.
-
-On peut montrer/cacher tous les onglets implémentés. En particulier, on peut visualiser dans les onglets "DB", tout ce qui a été rajouté dans la base de données.
-Le mode développeur ajoutera la durée de chaque tache dans les onglets d'analyse, et précisera son statut. 
+On peut aussi afficher ou masquer tous les onglets. En particulier, les onglets « DB » permettent de visualiser tout ce qui a été ajouté dans la base de données.
+Le mode développeur ajoute également la durée de chaque tâche et son statut dans les onglets d'analyse.
